@@ -5,7 +5,8 @@ const spotifyApi = new SpotifyWebApi ({
   // clientId: '2538eb4cf1e44053b1c1d5f6c5ba861e',
   // clientSecret: '073f8066aded42d7a0c5974bd972964a'
 });
-token = 'BQCUDmlKGlSkVDtZcNv-9dHvGUbi7FjpGzHEJBXzCzWmBIbMmwKloSspd9ZFSWnjy3sjb3dgJnSXIXUMKPUoV7SKca547G3nXKidc-aOHRcDc98_FoZjzaQ4RwZ0YBcXtQskyHl1NUi7puFprXl7bGpe7e324OsgbMm6Ze0CZxEMDr69flh4pGWO66ALCpNSdGjCOLOLgkIbBc7tIADl49YYGFvM-yBHVWqUYpKLzTn23WyodvHe4F1iHLLZjFI51bn7KTCL73sRTVL3Kg'
+// Haven't set up getting tokens yet so you have to get it manually from https://developer.spotify.com/console/post-playlist-tracks/. Ensure you've got 'playlist-modify-public' and 'playlist-modify-private'
+token = 'BQBdy52jCO4F9VmX0wO2c0tyGvha0eb-WTv4DZKHfhj2pjPR1oyV9ZMmb8ndNvHPhkBrCgDEPiuw-nwFvQWKWy2Uux9iMWJRwfZEP6Kzq4KtHr0UuYE3tl0t3ZCFqQs0PBTAxSmUTsUwpWBdVeX7ZYTdv_ecOvu-NV4wC0Lv8s2hQk9xfJSqiHkACVs0ABOW-IIvyZ13umLshzMxu7YtDfKDQerkhWMAUfzc_G2MlLr47rT9lH_pLt4G5SAzzYgKnrTh0xzMIU_E-HnvVg'
 
 spotifyApi.setAccessToken(token);
 
@@ -23,8 +24,8 @@ let savedTracks = []
 let relatedArtists = []
 let list
 let settings = {}
-let person = "Seyi"
-let seyi = { month:6, day:30 }
+let person = "Seyi" // enter your name here
+let seyi = { month:6, day:30 } // enter your birthday here
 let rawList = []
 let personal = {}
 let playLength = 40
@@ -167,7 +168,7 @@ async function addTrackstoPlaylist (array, params) {
   let name = person + '\'s ' + params.mood + ' playlist'
   let description = params.desc + '\nYou\'ll be luckiest at ' + params.time
 
-  await spotifyApi.addTracksToPlaylist('5ilDLzjCjM0yuE7XNVevji', array)
+  await spotifyApi.addTracksToPlaylist('5ilDLzjCjM0yuE7XNVevji', array) // enter the ID for your chosen playlist here
   .then(async function(res) {
     console.log(res.body)
     console.log('adding tracks to playlist - inner')
