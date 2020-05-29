@@ -9,6 +9,7 @@
   "author": "ST",
   "license": "ISC",
   "dependencies": {
+    "aztro-js": "^0.1.5",
     "horoscope": "^2.0.1",
     "spotify-web-api-js": "^1.2.0",
     "spotify-web-api-node": "^4.0.0"
