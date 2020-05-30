@@ -6,7 +6,7 @@ const spotifyApi = new SpotifyWebApi ({
   // clientSecret: '073f8066aded42d7a0c5974bd972964a'
 });
 // Haven't set up getting tokens yet so you have to get it manually from https://developer.spotify.com/console/post-playlist-tracks/. Ensure you've got 'playlist-modify-public' and 'playlist-modify-private'
-token = 'BQBdy52jCO4F9VmX0wO2c0tyGvha0eb-WTv4DZKHfhj2pjPR1oyV9ZMmb8ndNvHPhkBrCgDEPiuw-nwFvQWKWy2Uux9iMWJRwfZEP6Kzq4KtHr0UuYE3tl0t3ZCFqQs0PBTAxSmUTsUwpWBdVeX7ZYTdv_ecOvu-NV4wC0Lv8s2hQk9xfJSqiHkACVs0ABOW-IIvyZ13umLshzMxu7YtDfKDQerkhWMAUfzc_G2MlLr47rT9lH_pLt4G5SAzzYgKnrTh0xzMIU_E-HnvVg'
+token = 'BQAV62i7xLutIxPfKFImGRp32_n_TuooQ1z6XhuNZHNJMqnOhhjuWnNBWPcq3u2csy8GV0EYIGF-9t6SMrmBjvoolXawTg2uEtsyKYk4Xw0dcZM_jqwp_J78l2HjQ3W139U4IOBDTDFrgn_FhMJTcZaA5ZtqJrd0lxbotLgmV1jON-DU8nn_AcPDo6jjiF-XvGTUSmkceMCTViHeNFhyK_k9IagZUXnQVBC1BCEVl00tItxvltfcTjhq3lqcLr1DLRiSYDm4Puy1Ook'
 
 spotifyApi.setAccessToken(token);
 
@@ -28,7 +28,7 @@ let person = "Seyi" // enter your name here
 let seyi = { month:6, day:30 } // enter your birthday here
 let rawList = []
 let personal = {}
-let playLength = 40
+let playLength = 30
 let newLength = 35
 let oldLength = 5
 
@@ -168,11 +168,11 @@ async function addTrackstoPlaylist (array, params) {
   let name = person + '\'s ' + params.mood + ' playlist'
   let description = params.desc + '\nYou\'ll be luckiest at ' + params.time
 
-  await spotifyApi.addTracksToPlaylist('5ilDLzjCjM0yuE7XNVevji', array) // enter the ID for your chosen playlist here
+  await spotifyApi.addTracksToPlaylist('3C9PfZvzOapLxG0bXilhMw', array) // enter the ID for your chosen playlist here
   .then(async function(res) {
     console.log(res.body)
     console.log('adding tracks to playlist - inner')
-    await spotifyApi.changePlaylistDetails('5ilDLzjCjM0yuE7XNVevji', {name: name, description: description})
+    await spotifyApi.changePlaylistDetails('3C9PfZvzOapLxG0bXilhMw', {name: name, description: description})
   })
   .then(function() {
     console.log('added tracks')
@@ -181,6 +181,8 @@ async function addTrackstoPlaylist (array, params) {
   })
 }
 
+// spotify:playlist:3C9PfZvzOapLxG0bXilhMw
+// spotify:playlist:6uQn88g4c24ojzoSeiNHDh
 //spotify:playlist:4hDYMpz71Ofvfp1FGrGmjK
 //spotify:playlist:5ilDLzjCjM0yuE7XNVevji
 //spotify:playlist:5ilDLzjCjM0yuE7XNVevji

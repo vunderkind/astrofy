@@ -1,16 +1,33 @@
 {
   "name": "astro",
   "version": "1.0.0",
-  "description": "testing astrology",
-  "main": "index.js",
+  "description": "astrology",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ST",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fngrz/astro.git"
+  },
+  "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fngrz/astro/issues"
+  },
+  "homepage": "https://github.com/fngrz/astro#readme",
   "dependencies": {
+    "axios": "^0.19.2",
+    "aztro-js": "^0.1.5",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dependency-check": "^4.1.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "horoscope": "^2.0.1",
-    "spotify-web-api-js": "^1.2.0",
+    "image-to-base64": "^2.1.0",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.2",
     "spotify-web-api-node": "^4.0.0"
   }
 }
