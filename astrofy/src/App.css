@@ -88,24 +88,40 @@ button {
 }
 
 @media only screen and (max-width: 800px) {
-  
+  .headers{
+    width: 90%;
+    margin: 0 auto;
+  }
   h1 {
     font-size: 0.7em;
   }
 
   h2 {
     padding-top: 2em;
-    font-size: 2.5em;
+    font-size: 1.5em;
   }
 
   h3 {
-    font-size: 1.2em;
+    font-size: 1em;
   }
 
   form {
     width: 90vw;
+    margin-top: 2em;
+  }
+
+  .form-input{
+    
+    margin: 0 auto;
+    /* margin-top: 2em; */
+    padding:0;
+  }
+  #form2 input {
+    margin: 0.5em;
+    margin-top: 1em;
   }
   button {
-    font-size: 0.7em;
+    font-size: 0.8em;
+    margin-top: 1em;
   }
 }
