@@ -6,8 +6,8 @@ function App() {
     <div className="background">
       <div className="headers">
       <h1>ASTROFY MUSIC</h1>
-      <h2>Make a playlist aligned <br/>to your <span id="green">horoscope</span></h2>
-      <h3>Simply enter your name and birthday <br/> and you're on your way!</h3>
+      <h2>Make a playlist aligned to your <span id="green">horoscope</span></h2>
+      <h3>Simply enter your name and birthday and you're on your way!</h3>
       <form >
         <label id="form1">
           <input className='form-input' type="text" placeholder="FIRST NAME"/>

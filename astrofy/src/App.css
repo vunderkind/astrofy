@@ -13,6 +13,7 @@ body{
   background-color: black;
   background-repeat: no-repeat;
   height: 100vh;
+  width: 100vw;
 }
 
 h1{
@@ -49,6 +50,8 @@ form {
   margin: 0 auto;
 }
 
+
+
 .form-input {
   font-family: 'Nunito Sans';
   color: black;
@@ -82,4 +85,27 @@ button {
   font-weight: 500;
   letter-spacing: 0.3em;
   cursor: pointer;
+}
+
+@media only screen and (max-width: 800px) {
+  
+  h1 {
+    font-size: 0.7em;
+  }
+
+  h2 {
+    padding-top: 2em;
+    font-size: 2.5em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  form {
+    width: 90vw;
+  }
+  button {
+    font-size: 0.7em;
+  }
 }
