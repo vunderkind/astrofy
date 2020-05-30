@@ -22,7 +22,7 @@ const redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
 const astro = require("aztro-js")
 const horoscope = require('horoscope')
 const SpotifyWebApi = require('spotify-web-api-node');
-const spotify = new SpotifyWebApi ();
+const spotify = new SpotifyWebApi();
 
 /**
 Buffer
@@ -33,7 +33,8 @@ let img = fs.readFileSync('./images/image.png').toString('base64')
 GENERATOR
 **/
 async function shuffle(array) {
-  let m = array.length, t, i
+  let m = array.length,
+    t, i
   while (m) {
     i = Math.floor(Math.random() * m--)
     t = array[m]
@@ -43,7 +44,50 @@ async function shuffle(array) {
   return array
 }
 
-async function coverImage (playlist, token, base64) {
+async function chooseImage(sign) {
+  let image;
+  switch (sign) {
+    case 'Aquarius':
+      image = 'aquarius.png';
+      break;
+    case 'Pisces':
+      image = 'pisces.png';
+      break;
+    case 'Aries':
+      image = 'aries.png';
+      break;
+    case 'Taurus':
+      image = 'taurus.png';
+      break;
+    case 'Gemini':
+      image = 'gemini.png';
+      break;
+    case 'Cancer':
+      image = 'cancer.png';
+      break;
+    case 'Leo':
+      image = 'leo.png';
+      break;
+    case 'Virgo':
+      image = 'virgo.png';
+      break;
+    case 'Libra':
+      image = 'libra.png';
+      break;
+    case 'Scorpio':
+      image = 'scorpio.png';
+      break;
+    case 'Sagittarus':
+      image = 'sagittarus.png';
+      break;
+    case 'Capricorn':
+      image = 'capricorn.png';
+      break;
+  }
+  return image;
+}
+
+async function coverImage(playlistId, token, base64) {
   fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
     method: "PUT",
     mode: "cors",
@@ -56,40 +100,48 @@ async function coverImage (playlist, token, base64) {
   })
 }
 
-// uploadCoverImage: async function (playlistId, accessToken, base64) {
-//     try {
-//       return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
-//         method: "PUT",
-//         mode: "cors",
-//         cache: "no-cache",
-//         headers: {
-//           "Content-Type": "image/jpeg",
-//           "Authorization": `Bearer ${accessToken}`
-//         },
-//         body: base64, // eg. '/9j/....'
-//       })
-//     } catch (e) {
-//       return {error: e}
-//     }
-//   },
-
-async function go (month, day, token, image) {
+async function go(month, day, token, image) {
   let settings = {};
   let list;
   let key = token;
   let img = image;
-  await astro.getAllHoroscope(horoscope.getSign({month: month, day: day}), async function (res) {
-    settings = {limit: 10, offset: parseInt(res.today.lucky_number)}
+  let sign = horoscope.getSign({month: month, day: day})
+  let fortune
 
+  await astro.getAllHoroscope(sign, async function(res) {
+    settings = {
+      limit: 20,
+      offset: parseInt(res.today.lucky_number)
+    };
+    fortune = res.today.description;
     // Get top tracks
-    let range_options = ['short_term', 'medium_term', 'long_term']
+    let range_options = ['short_term', 'medium_term', 'long_term'];
     let range = range_options[Math.floor(Math.random() * range_options.length--)]
     let topTracks = [] // full list of top tracks
-    await spotify.getMyTopTracks({limit:20, offset: settings.offset, time_range: range})
-    .then(async function (res) {
-      if (res.body.items.length == 0) {
-        await spotify.getMyTopTracks({limit:20, offset: 10, time_range: range})
-        .then(function (res) {
+    await spotify.getMyTopTracks({
+        limit: settings.limit,
+        offset: settings.offset,
+        time_range: range
+      })
+      .then(async function(res) {
+        if (res.body.items.length == 0) {
+          let ran = Math.floor(Math.random() * settings.limit--)
+          await spotify.getMyTopTracks({
+              limit: settings.limit,
+              offset: ran,
+              time_range: range
+            })
+            .then(function(res) {
+              for (let item of res.body.items) {
+                let e = {}
+                e = {
+                  id: item.id,
+                  uri: item.uri
+                }
+                topTracks.push(e)
+              }
+            })
+        } else {
           for (let item of res.body.items) {
             let e = {}
             e = {
@@ -98,54 +150,55 @@ async function go (month, day, token, image) {
             }
             topTracks.push(e)
           }
-        })
-      } else {
-        for (let item of res.body.items) {
-          let e = {}
-          e = {
-            id: item.id,
-            uri: item.uri
-          }
-          topTracks.push(e)
         }
-      }
-    }).catch(function (err) {
-      console.error(err);
-    })
+      }).catch(function(err) {
+        console.error(err);
+      })
     shuffle(topTracks)
     let shorter = [] // seed list
     let shorter_uri = []
     let playlist = [] // empty playlist
-    let playlist_id
+    // let playlist_id
     for (i = 0; i < 5; i++) {
       shorter.push(topTracks[i].id)
       shorter_uri.push(topTracks[i].uri)
     }
-    await spotify.getRecommendations({seed_tracks: shorter, limit: 15})
-    .then(function (res) {
-      for (let item of res.body.tracks) {
-        playlist.push(item.uri)
-      }
-      for (let item of shorter_uri) {
-        playlist.push(item)
-      }
-      shuffle(playlist)
-      console.log(playlist)
-    }).catch(function (err) {
-      console.error(err);
-    })
-    await spotify.createPlaylist('11160978767', 'Astrofy 5', {'public': false, 'description': 'yaaaaaay'})
-    .then(async function(res) {
-      await spotify.addTracksToPlaylist(res.body.id, playlist)
-      .then(function (){
-        list = res.body.id
+    await spotify.getRecommendations({
+        seed_tracks: shorter,
+        limit: (settings.limit - 5)
       })
-      .catch((err) => {console.error(err)} )
-    }, function(err) {
-      console.log('Something went wrong!', err);
-    });
-    await coverImage(playlist, key, img)
-    .catch((err) => { console.error(err) })
+      .then(function(res) {
+        for (let item of res.body.tracks) {
+          playlist.push(item.uri)
+        }
+        for (let item of shorter_uri) {
+          playlist.push(item)
+        }
+        shuffle(playlist)
+        console.log(playlist)
+      }).catch(function(err) {
+        console.error(err);
+      })
+    await spotify.createPlaylist('11160978767', 'Astrofy 5', {
+        'public': true,
+        'description': fortune
+      }) // this should be USER_ID, 'something something', {'public': true, 'description': horoscope }
+      .then(async function(res) {
+          await spotify.addTracksToPlaylist(res.body.id, playlist)
+            .then(function() {
+              list = res.body.id
+            })
+            .catch((err) => {
+              console.error(err)
+            })
+        },
+        function(err) {
+          console.log('Something went wrong!', err);
+        });
+    // await coverImage(playlist, key, img)
+    //   .catch((err) => {
+    //     console.error(err)
+    //   })
   })
 }
 
@@ -173,8 +226,8 @@ var stateKey = 'spotify_auth_state';
 var app = express();
 
 app.use(express.static(__dirname + '/public'))
-   .use(cors())
-   .use(cookieParser());
+  .use(cors())
+  .use(cookieParser());
 
 app.get('/login', function(req, res) {
 
@@ -226,11 +279,13 @@ app.get('/callback', function(req, res) {
       if (!error && response.statusCode === 200) {
 
         var access_token = body.access_token,
-            refresh_token = body.refresh_token;
+          refresh_token = body.refresh_token;
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + access_token },
+          headers: {
+            'Authorization': 'Bearer ' + access_token
+          },
           json: true
         };
 
@@ -264,7 +319,9 @@ app.get('/refresh_token', function(req, res) {
   var refresh_token = req.query.refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    headers: {
+      'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+    },
     form: {
       grant_type: 'refresh_token',
       refresh_token: refresh_token
