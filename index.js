@@ -2,11 +2,14 @@ const aztroJs = require("aztro-js")
 const horoscope = require('horoscope')
 const SpotifyWebApi = require('spotify-web-api-node');
 const spotifyApi = new SpotifyWebApi ({
-  clientId: '2538eb4cf1e44053b1c1d5f6c5ba861e',
-  clientSecret: '073f8066aded42d7a0c5974bd972964a'
+  clientId: '2e1627a177104abe9c124cfc3fd0df7e',
+  clientSecret: '4633ef10f541414b905e30ba8763bca6'
 });
 // Haven't set up getting tokens yet so you have to get it manually from https://developer.spotify.com/console/post-playlist-tracks/. Ensure you've got 'playlist-modify-public' and 'playlist-modify-private'
-token = 'BQBdy52jCO4F9VmX0wO2c0tyGvha0eb-WTv4DZKHfhj2pjPR1oyV9ZMmb8ndNvHPhkBrCgDEPiuw-nwFvQWKWy2Uux9iMWJRwfZEP6Kzq4KtHr0UuYE3tl0t3ZCFqQs0PBTAxSmUTsUwpWBdVeX7ZYTdv_ecOvu-NV4wC0Lv8s2hQk9xfJSqiHkACVs0ABOW-IIvyZ13umLshzMxu7YtDfKDQerkhWMAUfzc_G2MlLr47rT9lH_pLt4G5SAzzYgKnrTh0xzMIU_E-HnvVg'
+let token = 'BQDYNJM7j9afRa_cQIq1uE4W5KH1a5CqvKdcW8Y7-DQK_4elBU86KiY3pVUjpLyP7doRSZTkoe26OCncJf7hlaRw_dhufUIOj7uFGzYw0-OusPe8DF_0Pc8F1Ak6bitqz_yL00mdfx_VsN331Q'
+let refreshToken = "AQCAOCrTlbX4VMTe0GCf0R1OY_edSrFeUDCL96v4aETyKPZP8TtIPOEBkNiUEDRnmqwuuHDkNY9cHSTzmxviuw1k5a1K9EmZrEAeLeUm0EciWYUZsl0OjZauQr-Y5H7HTdI"
+spotifyApi.setAccessToken(token);
+spotifyApi.setRefreshToken(refreshToken);
 
 spotifyApi.setAccessToken(token);
 
