@@ -1,0 +1,127 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;400;900&display=swap');
+
+body{
+  color: white;
+  text-align: center;
+  margin: 0;
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+.background{
+  background-image: url('img/top_bar.png');
+  background-color: black;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100vw;
+}
+
+h1{
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 1.5em;
+  font-weight: 500;
+  letter-spacing: 1.3em;
+  margin: 0;
+  padding-top: 4em;
+  padding-bottom: 0;
+}
+
+h2{
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 5em;
+  padding-top: 0;
+  margin: 0;
+  margin-top: 0.3em;
+}
+
+#green {
+  color: rgb(30,185,84);
+}
+
+h3{
+  font-size: 1.6em;
+  padding-top: 1em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+  margin: 0 auto;
+}
+
+
+
+.form-input {
+  font-family: 'Nunito Sans';
+  color: black;
+  width: 100%;
+  height: 3.5em;
+  margin: 0.4em;
+  border-radius: 50px;
+  box-shadow: none;
+  border: none;
+  text-align: center;
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+#form2{
+display: flex;
+flex-direction: row;
+}
+
+button {
+  font-family: 'Nunito Sans';
+  background: rgb(30,185,84);
+  color: white;
+  height: 3.5em;
+  margin-top: 1em;
+  border-radius: 50px;
+  box-shadow: none;
+  border: none;
+  text-align: center;
+  font-size: 0.9em;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 800px) {
+  .headers{
+    width: 90%;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 0.7em;
+  }
+
+  h2 {
+    padding-top: 2em;
+    font-size: 1.5em;
+  }
+
+  h3 {
+    font-size: 1em;
+  }
+
+  form {
+    width: 90vw;
+    margin-top: 2em;
+  }
+
+  .form-input{
+    
+    margin: 0 auto;
+    /* margin-top: 2em; */
+    padding:0;
+  }
+  #form2 input {
+    margin: 0.5em;
+    margin-top: 1em;
+  }
+  button {
+    font-size: 0.8em;
+    margin-top: 1em;
+  }
+}
