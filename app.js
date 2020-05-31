@@ -5,6 +5,7 @@ const querystring = require('querystring');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const bodyParser = require('body-parser')
 
 const client_id = '2538eb4cf1e44053b1c1d5f6c5ba861e'; // Your client id
 const client_secret = 'e4288b338d6b4d71acaf8addbe060b89'; // Your secret
@@ -19,9 +20,9 @@ const spotify = new SpotifyWebApi();
 /**
 Here are variables that are hard-coded. If you pass from the form to these 3, that's the end.
 // **/
-// let userMonth = 6;
-// let userDay = 30;
-// let userName = 'Seyi';
+let userMonth
+let userDay
+let userName
 
 async function shuffle(array) {
   let m = array.length,
@@ -91,7 +92,6 @@ function chooseImage(sign) {
 }
 
 async function uploadCoverImage (playlistId, accessToken, base64) {
-  console.log(`this is the access token: ${accessToken}`)
   fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
     method: "PUT",
     mode: "cors",
@@ -189,7 +189,6 @@ async function go(month, day, userSpotifyId, token, name) {
           playlist.push(item)
         }
         shuffle(playlist)
-        // console.log(`This is the playlist:\n${playlist}`)
       }).catch(function(err) {
         console.error(err);
       })
@@ -232,14 +231,19 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
+
 app.use(express.static(__dirname + '/public'))
   .use(cors())
-  .use(cookieParser());
+  .use(cookieParser())
+  .use(bodyParser.json());
 
 app.get('/login', function(req, res) {
+  let {userName,userDay,userMonth} = req.body;
+  
 
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
+  console.log('Res: ', res)
 
   // your application requests authorization
   var scope = 'ugc-image-upload user-read-private playlist-read-collaborative playlist-modify-public playlist-read-private playlist-modify-private user-library-read user-top-read';
@@ -249,8 +253,9 @@ app.get('/login', function(req, res) {
       client_id: client_id,
       scope: scope,
       redirect_uri: redirect_uri,
-      state: state
+      state: state,
     }));
+    console.log(req.query)
 });
 
 app.get('/callback', function(req, res) {
@@ -298,15 +303,9 @@ app.get('/callback', function(req, res) {
         
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          // console.log(access_token)
-          console.log(body);
           let user = body.id;
           let country = body.country;
           spotify.setAccessToken(access_token);
-          let userMonth = 3
-          let userDay = 10
-          let userName = 'Justin'
-          console.log(req.body)
 
           go(userMonth, userDay, user, access_token, userName)
         });
