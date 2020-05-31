@@ -68,7 +68,6 @@ form {
 
 #form2{
 display: flex;
-flex-direction: row;
 }
 
 button {
@@ -76,6 +75,7 @@ button {
   background: rgb(30,185,84);
   color: white;
   height: 3.5em;
+  margin: 0 auto;
   margin-top: 1em;
   border-radius: 50px;
   box-shadow: none;
@@ -85,6 +85,7 @@ button {
   font-weight: 500;
   letter-spacing: 0.3em;
   cursor: pointer;
+  width: 80%;
 }
 
 @media only screen and (max-width: 800px) {
@@ -116,9 +117,15 @@ button {
     /* margin-top: 2em; */
     padding:0;
   }
+
+  #form1 input {
+    margin: 0 auto;
+  }
   #form2 input {
+    margin: 0 auto;
     margin: 0.5em;
     margin-top: 1em;
+
   }
   button {
     font-size: 0.8em;
