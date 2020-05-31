@@ -1,12 +1,3 @@
-/**
- * This is an example of a basic node.js script that performs
- * the Authorization Code oAuth2 flow to authenticate against
- * the Spotify Accounts.
- *
- * For more information, read
- * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
- */
-
 const express = require('express'); // Express web server framework
 const request = require('request'); // "Request" library
 const cors = require('cors');
@@ -18,6 +9,7 @@ const fetch = require('node-fetch');
 const client_id = '2538eb4cf1e44053b1c1d5f6c5ba861e'; // Your client id
 const client_secret = 'e4288b338d6b4d71acaf8addbe060b89'; // Your secret
 const redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
+const img = require('./img')
 
 const astro = require("aztro-js")
 const horoscope = require('horoscope')
@@ -25,13 +17,12 @@ const SpotifyWebApi = require('spotify-web-api-node');
 const spotify = new SpotifyWebApi();
 
 /**
-Buffer
+Here are variables that are hard-coded. If you pass from the form to these 3, that's the end. 
 **/
-let img = fs.readFileSync('./images/image.png').toString('base64')
+let userMonth = 6;
+let userDay = 30;
+let userName = 'Seyi';
 
-/**
-GENERATOR
-**/
 async function shuffle(array) {
   let m = array.length,
     t, i
@@ -44,50 +35,51 @@ async function shuffle(array) {
   return array
 }
 
-async function chooseImage(sign) {
+function chooseImage(sign) {
   let image;
   switch (sign) {
     case 'Aquarius':
-      image = 'aquarius.png';
+      image = img.aquarius;
       break;
     case 'Pisces':
-      image = 'pisces.png';
+      image = img.pisces;
       break;
     case 'Aries':
-      image = 'aries.png';
+      image = img.aries;
       break;
     case 'Taurus':
-      image = 'taurus.png';
+      image = img.taurus;
       break;
     case 'Gemini':
-      image = 'gemini.png';
+      image = img.gemini;
       break;
     case 'Cancer':
-      image = 'cancer.png';
+      image = img.cancer;
       break;
     case 'Leo':
-      image = 'leo.png';
+      image = img.leo;
       break;
     case 'Virgo':
-      image = 'virgo.png';
+      image = img.virgo;
       break;
     case 'Libra':
-      image = 'libra.png';
+      image = img.libra;
       break;
     case 'Scorpio':
-      image = 'scorpio.png';
+      image = img.scorpio;
       break;
     case 'Sagittarus':
-      image = 'sagittarus.png';
+      image = img.sagittarus;
       break;
     case 'Capricorn':
-      image = 'capricorn.png';
+      image = img.capricorn;
       break;
   }
   return image;
 }
 
-async function coverImage(playlistId, token, base64) {
+async function uploadCoverImage (playlistId, accessToken, base64) {
+  console.log(`this is the access token: ${accessToken}`)
   fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
     method: "PUT",
     mode: "cors",
@@ -98,26 +90,32 @@ async function coverImage(playlistId, token, base64) {
     },
     body: base64, // eg. '/9j/....'
   })
+  .then((res) => {console.log(res)})
+  .catch((err) => {console.error(err)})
 }
 
-async function go(month, day, token, image) {
+async function go(month, day, userSpotifyId, token, name) {
   let settings = {};
   let list;
   let key = token;
-  let img = image;
   let sign = horoscope.getSign({month: month, day: day})
-  let fortune
+  let fortune;
+  let cover = chooseImage(sign)
+  // console.log(cover)
 
   await astro.getAllHoroscope(sign, async function(res) {
     settings = {
       limit: 20,
       offset: parseInt(res.today.lucky_number)
     };
+
     fortune = res.today.description;
+
     // Get top tracks
     let range_options = ['short_term', 'medium_term', 'long_term'];
     let range = range_options[Math.floor(Math.random() * range_options.length--)]
     let topTracks = [] // full list of top tracks
+
     await spotify.getMyTopTracks({
         limit: settings.limit,
         offset: settings.offset,
@@ -126,6 +124,7 @@ async function go(month, day, token, image) {
       .then(async function(res) {
         if (res.body.items.length == 0) {
           let ran = Math.floor(Math.random() * settings.limit--)
+
           await spotify.getMyTopTracks({
               limit: settings.limit,
               offset: ran,
@@ -154,16 +153,19 @@ async function go(month, day, token, image) {
       }).catch(function(err) {
         console.error(err);
       })
+
     shuffle(topTracks)
+
     let shorter = [] // seed list
     let shorter_uri = []
     let playlist = [] // empty playlist
-    // let playlist_id
+
     for (i = 0; i < 5; i++) {
       shorter.push(topTracks[i].id)
       shorter_uri.push(topTracks[i].uri)
     }
-    await spotify.getRecommendations({
+
+    await spotify.getRecommendations({ // get recommendations
         seed_tracks: shorter,
         limit: (settings.limit - 5)
       })
@@ -175,30 +177,23 @@ async function go(month, day, token, image) {
           playlist.push(item)
         }
         shuffle(playlist)
-        console.log(playlist)
+        // console.log(`This is the playlist:\n${playlist}`)
       }).catch(function(err) {
         console.error(err);
       })
-    await spotify.createPlaylist('11160978767', 'Astrofy 5', {
+
+    await spotify.createPlaylist( // create a new playlist
+      userSpotifyId,
+      `For ${name} by Astrofy`, {
         'public': true,
-        'description': fortune
-      }) // this should be USER_ID, 'something something', {'public': true, 'description': horoscope }
+        'description': `${sign.toUpperCase()}: ${fortune}`
+      })
       .then(async function(res) {
-          await spotify.addTracksToPlaylist(res.body.id, playlist)
-            .then(function() {
-              list = res.body.id
-            })
-            .catch((err) => {
-              console.error(err)
-            })
+        uploadCoverImage(res.body.id, key, cover)
+        await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist
+        .catch((err) => { console.error(err) })
         },
-        function(err) {
-          console.log('Something went wrong!', err);
-        });
-    // await coverImage(playlist, key, img)
-    //   .catch((err) => {
-    //     console.error(err)
-    //   })
+        function(err) { console.error(err) });
   })
 }
 
@@ -293,8 +288,10 @@ app.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
           // console.log(access_token)
           console.log(body);
+          let user = body.id;
+          let country = body.country;
           spotify.setAccessToken(access_token);
-          go(6, 30, access_token, img)
+          go(userMonth, userDay, user, access_token, userName)
         });
 
         // we can also pass the token to the browser to make requests from there
