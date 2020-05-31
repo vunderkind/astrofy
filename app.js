@@ -91,7 +91,6 @@ function chooseImage(sign) {
 }
 
 async function uploadCoverImage (playlistId, accessToken, base64) {
-  console.log(`this is the access token: ${accessToken}`)
   fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
     method: "PUT",
     mode: "cors",
@@ -106,14 +105,13 @@ async function uploadCoverImage (playlistId, accessToken, base64) {
   .catch((err) => {console.error(err)})
 }
 
-async function go(month, day, userSpotifyId, token, name) {
+async function go(month, day, userSpotifyId, token, name, country) {
   let settings = {};
   let list;
   let key = token;
   let sign = horoscope.getSign({month: month, day: day})
   let fortune;
   let cover = chooseImage(sign)
-  // console.log(cover)
 
   await astro.getAllHoroscope(sign, async function(res) {
     settings = {
@@ -179,7 +177,8 @@ async function go(month, day, userSpotifyId, token, name) {
 
     await spotify.getRecommendations({ // get recommendations
         seed_tracks: shorter,
-        limit: (settings.limit - 5)
+        limit: (settings.limit - 5),
+        country: country
       })
       .then(function(res) {
         for (let item of res.body.tracks) {
@@ -189,7 +188,6 @@ async function go(month, day, userSpotifyId, token, name) {
           playlist.push(item)
         }
         shuffle(playlist)
-        // console.log(`This is the playlist:\n${playlist}`)
       }).catch(function(err) {
         console.error(err);
       })
@@ -298,12 +296,11 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          // console.log(access_token)
           console.log(body);
           let user = body.id;
           let country = body.country;
           spotify.setAccessToken(access_token);
-          go(userMonth, userDay, user, access_token, userName)
+          go(userMonth, userDay, user, access_token, userName, country)
         });
 
         // we can also pass the token to the browser to make requests from there
