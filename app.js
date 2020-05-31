@@ -17,7 +17,7 @@ const SpotifyWebApi = require('spotify-web-api-node');
 const spotify = new SpotifyWebApi();
 
 /**
-Here are variables that are hard-coded. If you pass from the form to these 3, that's the end. 
+Here are variables that are hard-coded. If you pass from the form to these 3, that's the end.
 **/
 let userMonth = 6;
 let userDay = 30;
@@ -36,46 +36,58 @@ async function shuffle(array) {
 }
 
 function chooseImage(sign) {
-  let image;
+  let zod = {}
   switch (sign) {
     case 'Aquarius':
-      image = img.aquarius;
+      zod.image = img.aquarius;
+      zod.emoji = '0x2652'
       break;
     case 'Pisces':
-      image = img.pisces;
+      zod.image = img.pisces;
+      zod.emoji = '0x2653'
       break;
     case 'Aries':
-      image = img.aries;
+      zod.image = img.aries;
+      zod.emoji = '0x2648'
       break;
     case 'Taurus':
-      image = img.taurus;
+      zod.image = img.taurus;
+      zod.emoji = '0x2649'
       break;
     case 'Gemini':
-      image = img.gemini;
+      zod.image = img.gemini;
+      zod.emoji = '0x264A'
       break;
     case 'Cancer':
-      image = img.cancer;
+      zod.image = img.cancer;
+      zod.emoji = '0x264B'
       break;
     case 'Leo':
-      image = img.leo;
+      zod.image = img.leo;
+      zod.emoji = '0x264C'
       break;
     case 'Virgo':
-      image = img.virgo;
+      zod.image = img.virgo;
+      zod.emoji = '0x264D'
       break;
     case 'Libra':
-      image = img.libra;
+      zod.image = img.libra;
+      zod.emoji = '0x264E'
       break;
     case 'Scorpio':
-      image = img.scorpio;
+      zod.image = img.scorpio;
+      zod.emoji = '0x264F'
       break;
     case 'Sagittarus':
-      image = img.sagittarus;
+      zod.image = img.sagittarus;
+      zod.emoji = '0x2650'
       break;
     case 'Capricorn':
-      image = img.capricorn;
+      zod.image = img.capricorn;
+      zod.emoji = '0x2651'
       break;
   }
-  return image;
+  return zod;
 }
 
 async function uploadCoverImage (playlistId, accessToken, base64) {
@@ -186,10 +198,10 @@ async function go(month, day, userSpotifyId, token, name) {
       userSpotifyId,
       `For ${name} by Astrofy`, {
         'public': true,
-        'description': `${sign.toUpperCase()}: ${fortune}`
+        'description': `${String.fromCodePoint(cover.emoji)} ${sign.toUpperCase()}: ${fortune}`
       })
       .then(async function(res) {
-        uploadCoverImage(res.body.id, key, cover)
+        uploadCoverImage(res.body.id, key, cover.image)
         await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist
         .catch((err) => { console.error(err) })
         },
