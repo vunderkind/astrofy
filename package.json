@@ -4,13 +4,17 @@
   "description": "testing astrology",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
   "author": "ST",
   "license": "ISC",
   "dependencies": {
     "aztro-js": "^0.1.5",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
     "horoscope": "^2.0.1",
+    "nodemon": "^2.0.4",
     "spotify-web-api-js": "^1.2.0",
     "spotify-web-api-node": "^4.0.0"
   }
