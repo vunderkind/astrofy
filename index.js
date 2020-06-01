@@ -24,6 +24,8 @@ let userMonth
 let userDay
 let userName
 
+let port = process.env.PORT || 8888;
+
 async function shuffle(array) {
   let m = array.length,
     t, i
@@ -235,7 +237,12 @@ var app = express();
 app.use(express.static(__dirname + '/public'))
   .use(cors())
   .use(cookieParser())
-  .use(bodyParser.json());
+  .use(bodyParser.json())
+  .use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3001"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
 app.get('/login', function(req, res) {
   let {userName,userDay,userMonth} = req.body;
@@ -253,7 +260,7 @@ app.get('/login', function(req, res) {
       client_id: client_id,
       scope: scope,
       redirect_uri: redirect_uri,
-      state: state,
+      state: state
     }));
     console.log(req.query)
 });
@@ -352,5 +359,5 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
-console.log('Listening on 8888');
-app.listen(8888);
+console.log(`Listening on ${port}`);
+app.listen(port);

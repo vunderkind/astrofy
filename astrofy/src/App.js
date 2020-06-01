@@ -1,7 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
+  useEffect(()=>{
+    axios.get('localhost:8888/login')
+    .then(res=>console.log(res))
+    .catch(error=>console.log(error))
+  },[])
   return (
     <div className="background">
       <div className="headers">
