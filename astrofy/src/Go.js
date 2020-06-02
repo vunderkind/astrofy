@@ -90,7 +90,6 @@ const spotify = new SpotifyWebApi();
       
   export default async function go(props) {
         let settings = {};
-        console.log(props.userSpotifyId)
         spotify.setAccessToken(props.token)
         let list;
         let key = props.token;

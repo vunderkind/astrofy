@@ -7,7 +7,27 @@ function App() {
     //State lives here
     let [params,setParams] = useState(null);
     let [login, setLogin] = useState(false);
+    let [state, setState] = useState({
+      name: '',
+      month: '',
+      day: '',
+      clicked: false
+    })
 
+    const handleChange = (e) => {
+      let value = e.target.value
+      let name = e.target.name
+      setState({...state, [name]: value})
+    }
+
+    const handleClick = (e) => {
+      e.preventDefault();
+      setState({...state, clicked: true})
+      
+    };
+
+    
+    console.log(state);
     useEffect(() => {
       var hashParams = {};
       var e, r = /([^&;=]+)=?([^&;]*)/g,
@@ -31,23 +51,41 @@ function App() {
       <h1>ASTROFY MUSIC</h1>
       <h2>Make a playlist aligned <br/>to your <span id="green">horoscope</span></h2>
       <h3>Simply enter your name and birthday <br/> and you're on your way!</h3>
-      <form >
-        <label id="form1">
-          <input className='form-input' type="text" placeholder="FIRST NAME"/>
-        </label>
-        <label id="form2">
-          <input className='form-input' type="text" placeholder="MONTH"/>
-          <input className='form-input' type="text" placeholder="DAY"/>
-        </label>
-        <a href="http://localhost:8888/login">Log in to Spotify</a>
-        {/* <button>CONNECT TO SPOTIFY</button> */}
-        {login? <div>
-          <h1>We're in!</h1>
-          <h2>For real</h2>
-          <Go month='8' day='10' name='Justin' token={params.access_token} userSpotifyId='vunderkind'/>
-        </div>: null}
-      </form>
+        <a href="http://localhost:8888/login"><div className="button">CONNECT TO SPOTIFY</div></a>
       </div>
+        {login?
+          <>
+          <form >
+          <label id="form1">
+            <input 
+              className='form-input' 
+              type="text" 
+              placeholder="FIRST NAME"
+              name="name"
+              value={state.name}
+              onChange={handleChange}/>
+          </label>
+          <label id="form2">
+            <input 
+                className='form-input' 
+                type="number" 
+                placeholder="MONTH" 
+                name="month" 
+                value={state.month} 
+                onChange={handleChange}/>
+            <input 
+                className='form-input' 
+                type="number" 
+                placeholder="DAY"
+                name="day"
+                value={state.day}
+                onChange={handleChange}/>
+          </label>
+          <button className="button" style={{background: 'red'}}onClick={handleClick}>MAKE PLAYLIST</button>
+          </form>
+          {state.clicked? <Go month={state.month} day={state.day} name={state.name} token={params.access_token} userSpotifyId='vunderkind'/>: null}
+          </>
+        : null}
     </div>
   );
 }
