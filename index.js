@@ -312,13 +312,13 @@ app.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
           let user = body.id;
           let country = body.country;
-          spotify.setAccessToken(access_token);
+          // spotify.setAccessToken(access_token);
 
-          go(userMonth, userDay, user, access_token, userName)
+          // go(6, 12, user, access_token, userName)
         });
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' +
+        res.redirect('http://localhost:3000/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
