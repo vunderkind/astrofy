@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import Go from './Go';
+import GetFate from './Go';
     
 
 function App() {
@@ -83,7 +83,7 @@ function App() {
           </label>
           <button className="button" style={{background: 'red'}}onClick={handleClick}>MAKE PLAYLIST</button>
           </form>
-          {state.clicked? <Go month={state.month} day={state.day} name={state.name} token={params.access_token} userSpotifyId='vunderkind'/>: null}
+          {state.clicked? <GetFate month={state.month} day={state.day} name={state.name} token={params.access_token} userSpotifyId='vunderkind'/>: null}
           </>
         : null}
     </div>
