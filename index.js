@@ -24,6 +24,8 @@ let userMonth
 let userDay
 let userName
 
+let port = process.env.PORT || 8888;
+
 async function shuffle(array) {
   let m = array.length,
     t, i
@@ -235,7 +237,12 @@ var app = express();
 app.use(express.static(__dirname + '/public'))
   .use(cors())
   .use(cookieParser())
-  .use(bodyParser.json());
+  .use(bodyParser.json())
+  .use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3001"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
 app.get('/login', function(req, res) {
   let {userName,userDay,userMonth} = req.body;
@@ -253,7 +260,7 @@ app.get('/login', function(req, res) {
       client_id: client_id,
       scope: scope,
       redirect_uri: redirect_uri,
-      state: state,
+      state: state
     }));
     console.log(req.query)
 });
@@ -305,13 +312,13 @@ app.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
           let user = body.id;
           let country = body.country;
-          spotify.setAccessToken(access_token);
+          // spotify.setAccessToken(access_token);
 
-          go(userMonth, userDay, user, access_token, userName)
+          // go(6, 12, user, access_token, userName)
         });
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' +
+        res.redirect('http://localhost:3000/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
@@ -352,5 +359,5 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
-console.log('Listening on 8888');
-app.listen(8888);
+console.log(`Listening on ${port}`);
+app.listen(port);
