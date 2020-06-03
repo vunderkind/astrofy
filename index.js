@@ -1,47 +1,36 @@
-const aztroJs = require("aztro-js")
+const express = require('express'); // Express web server framework
+const request = require('request'); // "Request" library
+const cors = require('cors');
+const querystring = require('querystring');
+const cookieParser = require('cookie-parser');
+const fs = require('fs');
+const fetch = require('node-fetch');
+const bodyParser = require('body-parser')
+
+const client_id = '2538eb4cf1e44053b1c1d5f6c5ba861e'; // Your client id
+const client_secret = 'e4288b338d6b4d71acaf8addbe060b89'; // Your secret
+const redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
+const img = require('./img')
+
+const astro = require("aztro-js")
 const horoscope = require('horoscope')
 const SpotifyWebApi = require('spotify-web-api-node');
-const spotifyApi = new SpotifyWebApi ({
-  // clientId: '2538eb4cf1e44053b1c1d5f6c5ba861e',
-  // clientSecret: '073f8066aded42d7a0c5974bd972964a'
-});
-// Haven't set up getting tokens yet so you have to get it manually from https://developer.spotify.com/console/post-playlist-tracks/. Ensure you've got 'playlist-modify-public' and 'playlist-modify-private'
-token = 'BQBdy52jCO4F9VmX0wO2c0tyGvha0eb-WTv4DZKHfhj2pjPR1oyV9ZMmb8ndNvHPhkBrCgDEPiuw-nwFvQWKWy2Uux9iMWJRwfZEP6Kzq4KtHr0UuYE3tl0t3ZCFqQs0PBTAxSmUTsUwpWBdVeX7ZYTdv_ecOvu-NV4wC0Lv8s2hQk9xfJSqiHkACVs0ABOW-IIvyZ13umLshzMxu7YtDfKDQerkhWMAUfzc_G2MlLr47rT9lH_pLt4G5SAzzYgKnrTh0xzMIU_E-HnvVg'
+const spotify = new SpotifyWebApi();
 
-spotifyApi.setAccessToken(token);
+/**
+Here are variables that are hard-coded. If you pass from the form to these 3, that's the end.
+// **/
+let userMonth
+let userDay
+let userName
 
-// spotifyApi.clientCredentialsGrant()
-// .then(function(data) {
-//   console.log('The access token is ' + data.body['access_token'])
-//   spotifyApi.setAccessToken(data.body['access_token'])
-// }).catch(function (err) {
-//   console.error('error in credentials: ', err)
-// })
-
-
-let date = {}
-let savedTracks = []
-let relatedArtists = []
-let list
-let settings = {}
-let person = "Seyi" // enter your name here
-let seyi = { month:6, day:30 } // enter your birthday here
-let rawList = []
-let personal = {}
-let playLength = 40
-let newLength = 35
-let oldLength = 5
+let port = process.env.PORT || 8888;
 
 async function shuffle(array) {
-  let m = array.length, t, i
-
-  // While there remain elements to shuffle…
+  let m = array.length,
+    t, i
   while (m) {
-
-    // Pick a remaining element…
     i = Math.floor(Math.random() * m--)
-
-    // And swap it with the current element.
     t = array[m]
     array[m] = array[i]
     array[i] = t
@@ -49,208 +38,326 @@ async function shuffle(array) {
   return array
 }
 
-function getSign (date) {
-  let res = horoscope.getSign({
-    month: date.month,
-    day: date.day
-  })
-  settings.sign = res
-  return res
-}
-
-function makeSingle(n) {
-  let len = n.toString().length
-  // console.log(len, typeof len)
-  if (len > 1) {
-    return Math.floor(n / Math.pow(10, len-1))
-  } else {
-    return n
+function chooseImage(sign) {
+  let zod = {}
+  switch (sign) {
+    case 'Aquarius':
+      zod.image = img.aquarius;
+      zod.emoji = '0x2652'
+      break;
+    case 'Pisces':
+      zod.image = img.pisces;
+      zod.emoji = '0x2653'
+      break;
+    case 'Aries':
+      zod.image = img.aries;
+      zod.emoji = '0x2648'
+      break;
+    case 'Taurus':
+      zod.image = img.taurus;
+      zod.emoji = '0x2649'
+      break;
+    case 'Gemini':
+      zod.image = img.gemini;
+      zod.emoji = '0x264A'
+      break;
+    case 'Cancer':
+      zod.image = img.cancer;
+      zod.emoji = '0x264B'
+      break;
+    case 'Leo':
+      zod.image = img.leo;
+      zod.emoji = '0x264C'
+      break;
+    case 'Virgo':
+      zod.image = img.virgo;
+      zod.emoji = '0x264D'
+      break;
+    case 'Libra':
+      zod.image = img.libra;
+      zod.emoji = '0x264E'
+      break;
+    case 'Scorpio':
+      zod.image = img.scorpio;
+      zod.emoji = '0x264F'
+      break;
+    case 'Sagittarus':
+      zod.image = img.sagittarus;
+      zod.emoji = '0x2650'
+      break;
+    case 'Capricorn':
+      zod.image = img.capricorn;
+      zod.emoji = '0x2651'
+      break;
   }
+  return zod;
 }
 
-// ---------------- PARSERS ----------------------------
-async function parseSaved (source, output) {
-  for (let item of source) {
-    // console.log(source)
-    let obj = {}
-    obj.uri = item.track.uri
-    obj.title = item.track.name
-    obj.artist = item.track.artists[0].name
-    obj.id = item.track.artists[0].id
-    output.push(obj)
-  }
-}
-
-async function parseRelated (source, output) {
-  for (let item of source.body.artists) {
-    // let obj = {}
-    // obj.artist = item.name
-    // obj.popularity = item.popularity
-    // obj.id = item.id
-    output.push(item.id)
-    // console.log(item.id)
-  }
-}
-
-async function getSaved (params, output) {
-  console.log('getting saved tracks')
-  await spotifyApi.getMySavedTracks(params).then(async function(res) {
-    // console.log(res.body.items)
-    await parseSaved (res.body.items, output)
-  }).catch(function (err) {
-    console.log('error in getSaved: ' + err)
+async function uploadCoverImage (playlistId, accessToken, base64) {
+  fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
+    method: "PUT",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Content-Type": "image/jpeg",
+      "Authorization": `Bearer ${accessToken}`
+    },
+    body: base64, // eg. '/9j/....'
   })
-  console.log('getting saved tracks - complete')
+  .then((res) => {console.log(res)})
+  .catch((err) => {console.error(err)})
 }
 
-async function getSimilar (data, output) {
-  console.log('getting similar artists')
-  for (let item of data) {
-    // console.log(item.id)
-    await spotifyApi.getArtistRelatedArtists(item.id)
-    .then(async function (res) {
-      await parseRelated (res, output)
-    }).catch(function (err) {
-      console.log('error in getSimilar: ' + err)
-    })
-  }
-  // console.log(output)
-  // console.log('array length is now: ' + output.length)
-  console.log('getting similar artists - complete')
-}
+async function go(month, day, userSpotifyId, token, name) {
+  let settings = {};
+  let list;
+  let key = token;
+  let sign = horoscope.getSign({month: month, day: day})
+  let fortune;
+  let cover = chooseImage(sign)
+  // console.log(cover)
 
-async function getTop (artist) {
-  await spotifyApi.getArtistTopTracks(artist, 'US')
-  .then(async function (res) {
-    // let track = Math.floor(Math.random() * res.body.tracks.length)
-    rawList.push(res.body.tracks[Math.floor(Math.random() * res.body.tracks.length)].uri)
-    // for (let item of res.body.tracks) {
-    //   // console.log(item.uri)
-    //   rawList.push(item.uri)
-    // }
-  }).catch(function (err) {
-    console.log('error in getTop: ' + err)
-  })
-}
-
-async function onlyUnique(value, index, self) {
-    return self.indexOf(value) === index
-}
-
-async function getFamiliar(source, final) {
-  while (final.length < playLength) {
-    final.push(source[Math.floor(Math.random() * source.length)].uri)
-  }
-  await shuffle(final)
-}
-
-async function makeFinal (array) {
-  let newArray = []
-  while (newArray.length < playLength) {
-    newArray.push(array[Math.floor(Math.random() * array.length)])
-    newArray = newArray.filter(onlyUnique)
-  }
-  return newArray
-}
-
-async function makePlaylist (params) {
-  let name = person + '\'s ' + params.mood + ' playlist'
-  let description = params.desc + '\nYou\'ll be luckiest at ' + params.time
-  spotifyApi.createPlaylist(name, { 'public' : true, description })
-  .then(function(res){
-    console.log(res)
-  }).catch(function (err) {
-    console.log('error in makePlaylist: ' + err)
-  })
-}
-
-async function addTrackstoPlaylist (array, params) {
-  let name = person + '\'s ' + params.mood + ' playlist'
-  let description = params.desc + '\nYou\'ll be luckiest at ' + params.time
-
-  await spotifyApi.addTracksToPlaylist('5ilDLzjCjM0yuE7XNVevji', array) // enter the ID for your chosen playlist here
-  .then(async function(res) {
-    console.log(res.body)
-    console.log('adding tracks to playlist - inner')
-    await spotifyApi.changePlaylistDetails('5ilDLzjCjM0yuE7XNVevji', {name: name, description: description})
-  })
-  .then(function() {
-    console.log('added tracks')
-  }).catch(function (err) {
-    console.log('error in addTracksToPlaylist: ' + err)
-  })
-}
-
-//spotify:playlist:4hDYMpz71Ofvfp1FGrGmjK
-//spotify:playlist:5ilDLzjCjM0yuE7XNVevji
-//spotify:playlist:5ilDLzjCjM0yuE7XNVevji
-
-//------------------------- HERE WE GOOOOOO ----------------------
-
-// checkHoroscope(seyi).then(async function () {
-//   await getSaved(settings, savedTracks).then(async function() {
-//     // console.log(settings)
-//     await getSimilar (savedTracks, relatedArtists).then(async function () {
-//       for (let item of relatedArtists) {
-//         await getTop (item.id)
-//       }
-//     }).then(async function () {
-//       await shuffle(rawList)
-//     }).then(async function () {
-//       let finalest = await makeFinal(rawList)
-//     }).catch(function (err) {
-//       console.log('error in main: ' + err)
-//     })
-//   })
-// })
-
-async function go (user) {
-  await aztroJs.getAllHoroscope(getSign(user), async function(res) {
-    let obj = {}
-    obj = {
-      desc: res.today.description,
-      time: res.today.lucky_time,
-      color: res.today.color,
-      mood: res.today.mood
-    }
-    let savedSettings = {
-      limit: 10,
+  await astro.getAllHoroscope(sign, async function(res) {
+    settings = {
+      limit: 20,
       offset: parseInt(res.today.lucky_number)
-    }
-    console.log(savedSettings)
-    await getSaved(savedSettings, savedTracks).then(async function() {
-      // console.log(settings)
-      await getSimilar (savedTracks, relatedArtists).then(async function () {
-        console.log('getting top tracks')
-        relatedArtists = relatedArtists.filter(onlyUnique)
-        await shuffle(relatedArtists)
-        relatedArtists.length = newLength
-        for (let item of relatedArtists) {
-          await getTop (item)
+    };
+
+    fortune = res.today.description;
+
+    // Get top tracks
+    let range_options = ['short_term', 'medium_term', 'long_term'];
+    let range = range_options[Math.floor(Math.random() * range_options.length--)]
+    let topTracks = [] // full list of top tracks
+
+    await spotify.getMyTopTracks({
+        limit: settings.limit,
+        offset: settings.offset,
+        time_range: range
+      })
+      .then(async function(res) {
+        if (res.body.items.length == 0) {
+          let ran = Math.floor(Math.random() * settings.limit--)
+
+          await spotify.getMyTopTracks({
+              limit: settings.limit,
+              offset: ran,
+              time_range: range
+            })
+            .then(function(res) {
+              for (let item of res.body.items) {
+                let e = {}
+                e = {
+                  id: item.id,
+                  uri: item.uri
+                }
+                topTracks.push(e)
+              }
+            })
+        } else {
+          for (let item of res.body.items) {
+            let e = {}
+            e = {
+              id: item.id,
+              uri: item.uri
+            }
+            topTracks.push(e)
+          }
         }
-        console.log('getting top tracks - complete')
-      }).then(async function () {
-        // await shuffle(rawList)
-        console.log('getting familiar tracks')
-        await getFamiliar(savedTracks, rawList)
-        rawList = rawList.filter(onlyUnique)
-        console.log('playlist made with ' + rawList.length + ' tracks!')
-        console.log('getting familiar tracks - complete')
+      }).catch(function(err) {
+        console.error(err);
       })
-      // .then(async function () {
-      //   let finalest = await makeFinal(rawList)
-      //   // console.log(finalest)
-      // })
-      .then(async function() {
-        // await makePlaylist (obj)
-        console.log('adding tracks to playlist - main')
-        await addTrackstoPlaylist(rawList, obj)
+
+    shuffle(topTracks)
+
+    let shorter = [] // seed list
+    let shorter_uri = []
+    let playlist = [] // empty playlist
+
+    for (i = 0; i < 5; i++) {
+      shorter.push(topTracks[i].id)
+      shorter_uri.push(topTracks[i].uri)
+    }
+
+    await spotify.getRecommendations({ // get recommendations
+        seed_tracks: shorter,
+        limit: (settings.limit - 5)
       })
-      .catch(function (err) {
-        console.log('error in main: ' + err)
+      .then(function(res) {
+        for (let item of res.body.tracks) {
+          playlist.push(item.uri)
+        }
+        for (let item of shorter_uri) {
+          playlist.push(item)
+        }
+        shuffle(playlist)
+      }).catch(function(err) {
+        console.error(err);
       })
-    })
+
+    await spotify.createPlaylist( // create a new playlist
+      userSpotifyId,
+      `For ${name} by Astrofy`, {
+        'public': true,
+        'description': `${String.fromCodePoint(cover.emoji)} ${sign.toUpperCase()}: ${fortune}`
+      })
+      .then(async function(res) {
+        uploadCoverImage(res.body.id, key, cover.image)
+        await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist
+        .catch((err) => { console.error(err) })
+        },
+        function(err) { console.error(err) });
   })
 }
 
-go(seyi)
+
+/**
+CONNECTOR
+**/
+/**
+ * Generates a random string containing numbers and letters
+ * @param  {number} length The length of the string
+ * @return {string} The generated string
+ */
+var generateRandomString = function(length) {
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (var i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
+
+var stateKey = 'spotify_auth_state';
+
+var app = express();
+
+
+app.use(express.static(__dirname + '/public'))
+  .use(cors())
+  .use(cookieParser())
+  .use(bodyParser.json())
+  .use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3001"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
+app.get('/login', function(req, res) {
+  let {userName,userDay,userMonth} = req.body;
+  
+
+  var state = generateRandomString(16);
+  res.cookie(stateKey, state);
+  console.log('Res: ', res)
+
+  // your application requests authorization
+  var scope = 'ugc-image-upload user-read-private playlist-read-collaborative playlist-modify-public playlist-read-private playlist-modify-private user-library-read user-top-read';
+  res.redirect('https://accounts.spotify.com/authorize?' +
+    querystring.stringify({
+      response_type: 'code',
+      client_id: client_id,
+      scope: scope,
+      redirect_uri: redirect_uri,
+      state: state
+    }));
+    console.log(req.query)
+});
+
+app.get('/callback', function(req, res) {
+
+  // your application requests refresh and access tokens
+  // after checking the state parameter
+
+  var code = req.query.code || null;
+  var state = req.query.state || null;
+  var storedState = req.cookies ? req.cookies[stateKey] : null;
+
+  if (state === null || state !== storedState) {
+    res.redirect('/#' +
+      querystring.stringify({
+        error: 'state_mismatch'
+      }));
+  } else {
+    res.clearCookie(stateKey);
+    var authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      form: {
+        code: code,
+        redirect_uri: redirect_uri,
+        grant_type: 'authorization_code'
+      },
+      headers: {
+        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+      },
+      json: true
+    };
+
+    request.post(authOptions, function(error, response, body) {
+      if (!error && response.statusCode === 200) {
+
+        var access_token = body.access_token,
+          refresh_token = body.refresh_token;
+
+        var options = {
+          url: 'https://api.spotify.com/v1/me',
+          headers: {
+            'Authorization': 'Bearer ' + access_token
+          },
+          json: true
+        };
+        
+        // use the access token to access the Spotify Web API
+        request.get(options, function(error, response, body) {
+          let user = body.id;
+          let country = body.country;
+          // spotify.setAccessToken(access_token);
+
+          // go(6, 12, user, access_token, userName)
+        });
+
+        // we can also pass the token to the browser to make requests from there
+        res.redirect('http://localhost:3000/#' +
+          querystring.stringify({
+            access_token: access_token,
+            refresh_token: refresh_token
+          }));
+      } else {
+        res.redirect('/#' +
+          querystring.stringify({
+            error: 'invalid_token'
+          }));
+      }
+    });
+  }
+});
+
+app.get('/refresh_token', function(req, res) {
+
+  // requesting access token from refresh token
+  var refresh_token = req.query.refresh_token;
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: {
+      'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+    },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    },
+    json: true
+  };
+
+  request.post(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var access_token = body.access_token;
+      res.send({
+        'access_token': access_token
+      });
+    }
+  });
+});
+
+console.log(`Listening on ${port}`);
+app.listen(port);
