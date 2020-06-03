@@ -20,9 +20,8 @@ const spotify = new SpotifyWebApi();
 /**
 Here are variables that are hard-coded. If you pass from the form to these 3, that's the end.
 // **/
-let userMonth
-let userDay
-let userName
+let user
+let country
 
 let port = process.env.PORT || 8888;
 
@@ -245,12 +244,8 @@ app.use(express.static(__dirname + '/public'))
   });
 
 app.get('/login', function(req, res) {
-  let {userName,userDay,userMonth} = req.body;
-  
-
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
-  console.log('Res: ', res)
 
   // your application requests authorization
   var scope = 'ugc-image-upload user-read-private playlist-read-collaborative playlist-modify-public playlist-read-private playlist-modify-private user-library-read user-top-read';
@@ -262,7 +257,6 @@ app.get('/login', function(req, res) {
       redirect_uri: redirect_uri,
       state: state
     }));
-    console.log(req.query)
 });
 
 app.get('/callback', function(req, res) {
@@ -289,7 +283,7 @@ app.get('/callback', function(req, res) {
         grant_type: 'authorization_code'
       },
       headers: {
-        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
       },
       json: true
     };
@@ -310,18 +304,18 @@ app.get('/callback', function(req, res) {
         
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          let user = body.id;
-          let country = body.country;
-          // spotify.setAccessToken(access_token);
-
-          // go(6, 12, user, access_token, userName)
+          user = body.id;
+          country = body.country;
+          return(user, country)
         });
-
+        console.log(user,country)
         // we can also pass the token to the browser to make requests from there
         res.redirect('http://localhost:3000/#' +
           querystring.stringify({
             access_token: access_token,
-            refresh_token: refresh_token
+            refresh_token: refresh_token,
+            userName: user,
+            userCountry: country
           }));
       } else {
         res.redirect('/#' +
