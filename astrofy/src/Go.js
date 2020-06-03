@@ -196,7 +196,7 @@ const spotify = new SpotifyWebApi();
     
         }
         go(props)
-    })
+    },[])
         return (
             <div>
                 <h2>Hey, {props.name}.</h2>
