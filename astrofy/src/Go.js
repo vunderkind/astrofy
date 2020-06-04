@@ -1,13 +1,29 @@
 import React, { useEffect } from 'react';
+import axios from 'axios';
 const astro = require("aztro-js")
 const img = require('./img')
 const SpotifyWebApi = require('spotify-web-api-node');
 const horoscope = require('horoscope')
 const spotify = new SpotifyWebApi();
+const request = require('request');
+
 
     //Go function
     export default function GetFate(props){
+        let userID;
         useEffect(()=> {
+            axios.get('https://api.spotify.com/v1/me', {
+                headers: {
+                    'Authorization': 'Bearer ' + props.token
+                  }
+            })
+            .then(res=>{
+                console.log(res);
+                userID = res.data.id;
+            })
+            .catch(err=>console.log(err))
+
+
             async function shuffle(array) {
                 let m = array.length,
                   t, i
@@ -89,11 +105,9 @@ const spotify = new SpotifyWebApi();
                 .then((res) => {console.log(res)})
                 .catch((err) => {console.error(err)})
               }
-              
           async function go(props) {
                 let settings = {};
                 spotify.setAccessToken(props.token)
-                let list;
                 let key = props.token;
                 let sign = horoscope.getSign({month: parseInt(props.month), day: parseInt(props.day)})
                 console.log(`${props.name} is a ${sign}`)
@@ -179,13 +193,14 @@ const spotify = new SpotifyWebApi();
                     }).catch(function(err) {
                       console.error(err);
                     })
+                
                     
                   await spotify.createPlaylist( // create a new playlist
-                    props.userSpotifyId,
+                    userID,
                     `For ${props.name} by Astrofy`, {
                       'public': true,
-                      'description': `${String.fromCodePoint(cover.emoji)} ${sign.toUpperCase()}: ${fortune}`
-                    })
+                      'description': `${sign.toUpperCase()}: ${fortune}`
+                    }) //took out the String.fromCodePoint method because it sometimes returns NaN instead of expected Unicode. See documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCodePoint
                     .then(async function(res) {
                       uploadCoverImage(res.body.id, key, cover.image)
                       await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist

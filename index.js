@@ -304,8 +304,9 @@ app.get('/callback', function(req, res) {
         
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          user = body.id;
-          country = body.country;
+          user = body.user;
+          country = body.country
+
           return(user, country)
         });
         console.log(user,country)
@@ -313,9 +314,7 @@ app.get('/callback', function(req, res) {
         res.redirect('http://localhost:3000/#' +
           querystring.stringify({
             access_token: access_token,
-            refresh_token: refresh_token,
-            userName: user,
-            userCountry: country
+            refresh_token: refresh_token
           }));
       } else {
         res.redirect('/#' +
