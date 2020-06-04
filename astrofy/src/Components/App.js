@@ -7,6 +7,9 @@ import Form from './Form';
 function App() {
     let [params,setParams] = useState(null);
     let [login, setLogin] = useState(false);
+    let [visibility, setVisibility] = useState({
+      display: 'visible'
+    })
     let [state, setState] = useState({
       name: '',
       month: '',
@@ -22,6 +25,7 @@ function App() {
 
     const handleClick = (e) => {
       e.preventDefault();
+      setVisibility({display: 'none'})
       setState({...state, clicked: true})
       
     };
@@ -49,13 +53,15 @@ function App() {
     <div className="background">
       <div className="headers">
         {login?
-          <>
+        <>
+          <div style={{display: visibility.display}}>
           <h1>YOUR HOROSCOPE PLAYLIST</h1>
           <h3>Enter your name and birthday <br/> and get your <span id="green">playlist!</span></h3>
-          <Form 
+          <Form
               handleChange={handleChange} 
               handleClick={handleClick} 
               state={state}/>
+          </div>
           {state.clicked? <GetFate month={state.month} day={state.day} name={state.name} token={params.access_token}/>: null}
           </>
         : <><h1>ASTROFY MUSIC</h1>

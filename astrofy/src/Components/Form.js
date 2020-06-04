@@ -1,7 +1,7 @@
 import React from 'react';
 export default function Form (props) {
     return (
-        <form >
+        <form style={{display:props.visibility}}>
           <label id="form1">
             <input 
               className='form-input' 

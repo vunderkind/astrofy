@@ -1,5 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { css } from "@emotion/core";
+import ScaleLoader from "react-spinners/ScaleLoader";
+
+
 const astro = require("aztro-js")
 const img = require('./img')
 const SpotifyWebApi = require('spotify-web-api-node');
@@ -7,9 +11,19 @@ const horoscope = require('horoscope')
 const spotify = new SpotifyWebApi();
 const request = require('request');
 
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
+
+
 
     //Go function
     export default function GetFate(props){
+      let [state, setState] = useState({
+        loading: true
+      })
         let userID;
         useEffect(()=> {
             axios.get('https://api.spotify.com/v1/me', {
@@ -203,7 +217,8 @@ const request = require('request');
                     }) //took out the String.fromCodePoint method because it sometimes returns NaN instead of expected Unicode. See documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCodePoint
                     .then(async function(res) {
                       uploadCoverImage(res.body.id, key, cover.image)
-                      await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist
+                      await spotify.addTracksToPlaylist(res.body.id, playlist)
+                      .then(setState({loading: false})) // add tracks to playlist
                       .catch((err) => { console.error(err) })
                       },
                       function(err) { console.error(err) });
@@ -213,8 +228,12 @@ const request = require('request');
         go(props)
     },[])
         return (
-            <div>
-            {userID? <div>hello ${userID}!</div>: <div>Hang on...</div>}
-            </div>
+          
+          state.loading? <div className="sweet-loading">
+          <ScaleLoader
+            css={override}
+            size={150}
+            color={"rgb(30,185,84)"}
+            loading={state.loading}/></div>: <h2>hey</h2>
         )
       }
