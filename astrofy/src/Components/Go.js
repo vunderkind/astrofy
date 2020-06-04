@@ -214,8 +214,7 @@ const request = require('request');
     },[])
         return (
             <div>
-                <h2>Hey, {props.name}.</h2>
-                <h2>Welcome!</h2>
+            {userID? <div>hello ${userID}!</div>: <div>Hang on...</div>}
             </div>
         )
       }
