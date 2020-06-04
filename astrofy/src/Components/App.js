@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import '../App.css';
-import GetFate from './Go';
+import GetFate from './GetFate';
 import Form from './Form';
     
 
@@ -31,7 +31,7 @@ function App() {
     };
 
     
-    console.log(state);
+    // console.log(state);
     useEffect(() => {
       var hashParams = {};
       var e, r = /([^&;=]+)=?([^&;]*)/g,
@@ -42,10 +42,10 @@ function App() {
          e = r.exec(q);
       }
       setParams(params=hashParams);
-      console.log('Params: ', params.access_token);
+      // console.log('Params: ', params.access_token);
       const token = params.access_token;
       setLogin(token? login=true : login=false);
-      console.log(login)
+      // console.log(login)
     }, [])
 
     

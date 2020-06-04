@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { css } from "@emotion/core";
 import ScaleLoader from "react-spinners/ScaleLoader";
+import Results from './Results';
 
 
 const astro = require("aztro-js")
@@ -24,7 +25,15 @@ const override = css`
       let [state, setState] = useState({
         loading: true
       })
+
+      let [musicData, setMusicData] = useState({
+        fortune: '',
+        horoscope: '',
+        name: ''
+      })
         let userID;
+        let cover;
+        let userName;
         useEffect(()=> {
             axios.get('https://api.spotify.com/v1/me', {
                 headers: {
@@ -32,8 +41,9 @@ const override = css`
                   }
             })
             .then(res=>{
-                console.log(res);
+                // console.log(res);
                 userID = res.data.id;
+                userName = res.data.display_name
             })
             .catch(err=>console.log(err))
 
@@ -116,7 +126,7 @@ const override = css`
                   },
                   body: base64, // eg. '/9j/....'
                 })
-                .then((res) => {console.log(res)})
+                // .then((res) => {console.log(res)})
                 .catch((err) => {console.error(err)})
               }
           async function go(props) {
@@ -124,9 +134,9 @@ const override = css`
                 spotify.setAccessToken(props.token)
                 let key = props.token;
                 let sign = horoscope.getSign({month: parseInt(props.month), day: parseInt(props.day)})
-                console.log(`${props.name} is a ${sign}`)
+                // console.log(`${props.name} is a ${sign}`)
                 let fortune;
-                let cover = chooseImage(sign)
+                cover = chooseImage(sign)
                 // console.log(cover)
               
                 await astro.getAllHoroscope(sign, async function(res) {
@@ -218,7 +228,15 @@ const override = css`
                     .then(async function(res) {
                       uploadCoverImage(res.body.id, key, cover.image)
                       await spotify.addTracksToPlaylist(res.body.id, playlist)
-                      .then(setState({loading: false})) // add tracks to playlist
+                      .then(res=>{
+                        setState({loading: false})
+                        setMusicData({
+                          horoscope: sign,
+                          fortune,
+                          name: userName
+
+                        })}
+                        ) // add tracks to playlist
                       .catch((err) => { console.error(err) })
                       },
                       function(err) { console.error(err) });
@@ -234,6 +252,8 @@ const override = css`
             css={override}
             size={150}
             color={"rgb(30,185,84)"}
-            loading={state.loading}/></div>: <h2>hey</h2>
+            loading={state.loading}/></div>
+            : 
+            <Results name={musicData.name} horoscope={musicData.horoscope} fortune={musicData.fortune}/>
         )
       }
