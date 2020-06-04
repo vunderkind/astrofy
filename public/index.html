@@ -21,6 +21,10 @@
       <div id="login">
         <h1>This is an example of the Authorization Code flow</h1>
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+        <form>
+          <input type="text" id="fname" name="fname" value="First Name"/>
+          <input type="text" id="day" name="day" value="Day"/>
+        </form>
       </div>
       <div id="loggedin">
         <div id="user-profile">
@@ -78,6 +82,8 @@
           return hashParams;
         }
 
+        var first_name, birth_day;
+
         var userProfileSource = document.getElementById('user-profile-template').innerHTML,
             userProfileTemplate = Handlebars.compile(userProfileSource),
             userProfilePlaceholder = document.getElementById('user-profile');
@@ -127,11 +133,16 @@
                 'refresh_token': refresh_token
               }
             }).done(function(data) {
+              let fname_box = document.getElementById('fname');
+              let bday_box = document.getElementById('day')
               access_token = data.access_token;
               oauthPlaceholder.innerHTML = oauthTemplate({
                 access_token: access_token,
-                refresh_token: refresh_token
+                refresh_token: refresh_token,
+                first_name: fname_box.value,
+                birth_day: bday_box.value
               });
+
             });
           }, false);
         }

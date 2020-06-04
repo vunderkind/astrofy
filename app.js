@@ -105,7 +105,8 @@ async function uploadCoverImage (playlistId, accessToken, base64) {
   .catch((err) => {console.error(err)})
 }
 
-async function go(month, day, userSpotifyId, token, name, country) {
+async function go(month, day, userSpotifyId, token, name, country, name, bday) {
+  console.log(name, bday)
   let settings = {};
   let list;
   let key = token;
@@ -282,9 +283,12 @@ app.get('/callback', function(req, res) {
 
     request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
+        console.log(body)
 
         var access_token = body.access_token,
-          refresh_token = body.refresh_token;
+          refresh_token = body.refresh_token,
+          first_name = body.first_name,
+          birth_day = body.birty_day;
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
@@ -300,7 +304,7 @@ app.get('/callback', function(req, res) {
           let user = body.id;
           let country = body.country;
           spotify.setAccessToken(access_token);
-          go(userMonth, userDay, user, access_token, userName, country)
+          go(userMonth, userDay, user, access_token, userName, country, first_name, birth_day)
         });
 
         // we can also pass the token to the browser to make requests from there
