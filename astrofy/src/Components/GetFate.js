@@ -126,7 +126,7 @@ const override = css`
                   },
                   body: base64, // eg. '/9j/....'
                 })
-                // .then((res) => {console.log(res)})
+                .then((res) => {console.log(res)})
                 .catch((err) => {console.error(err)})
               }
           async function go(props) {
