@@ -4,3 +4,5 @@ node_modules
 .vercel
 /images/
 /test.js
+/astrofy/src/test.js
+/html/
