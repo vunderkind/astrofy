@@ -6,3 +6,5 @@ node_modules
 /test.js
 /astrofy/src/test.js
 /html/
+/image.js
+/images.js

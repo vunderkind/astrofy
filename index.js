@@ -7,9 +7,8 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
 
-const client_id = '2538eb4cf1e44053b1c1d5f6c5ba861e'; // Your client id
-const client_secret = 'e4288b338d6b4d71acaf8addbe060b89'; // Your secret
-const redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
+const client_id = '2e1627a177104abe9c124cfc3fd0df7e'; // Your client id
+const client_secret = '4633ef10f541414b905e30ba8763bca6'; // Your secret
 const img = require('./img')
 
 const astro = require("aztro-js")
@@ -17,13 +16,17 @@ const horoscope = require('horoscope')
 const SpotifyWebApi = require('spotify-web-api-node');
 const spotify = new SpotifyWebApi();
 
+const website = 'http://localhost:3000'
+const server = 'http://localhost:8888'
+
 /**
 Here are variables that are hard-coded. If you pass from the form to these 3, that's the end.
 // **/
 let user
 let country
 
-let port = process.env.PORT || 8888;
+let port = process.env.PORT || '8888';
+const redirect_uri = `${server}/callback/`; // Your redirect uri
 
 async function shuffle(array) {
   let m = array.length,
@@ -92,31 +95,38 @@ function chooseImage(sign) {
   return zod;
 }
 
-async function uploadCoverImage (playlistId, accessToken, base64) {
+async function uploadCoverImage(playlistId, accessToken, base64) {
   fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
-    method: "PUT",
-    mode: "cors",
-    cache: "no-cache",
-    headers: {
-      "Content-Type": "image/jpeg",
-      "Authorization": `Bearer ${accessToken}`
-    },
-    body: base64, // eg. '/9j/....'
-  })
-  .then((res) => {console.log(res)})
-  .catch((err) => {console.error(err)})
+      method: "PUT",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "image/jpeg",
+        "Authorization": `Bearer ${accessToken}`
+      },
+      body: base64, // eg. '/9j/....'
+    })
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((err) => {
+      console.error(err)
+    })
 }
 
 async function go(month, day, userSpotifyId, token, name) {
   let settings = {};
   let list;
   let key = token;
-  let sign = horoscope.getSign({month: month, day: day})
+  let sign = horoscope.getSign({
+    month: month,
+    day: day
+  })
   let fortune;
   let cover = chooseImage(sign)
   // console.log(cover)
 
-  await astro.getAllHoroscope(sign, async function(res) {
+  await astro.getAllHoroscope(sign, async function (res) {
     settings = {
       limit: 20,
       offset: parseInt(res.today.lucky_number)
@@ -134,7 +144,7 @@ async function go(month, day, userSpotifyId, token, name) {
         offset: settings.offset,
         time_range: range
       })
-      .then(async function(res) {
+      .then(async function (res) {
         if (res.body.items.length == 0) {
           let ran = Math.floor(Math.random() * settings.limit--)
 
@@ -143,7 +153,7 @@ async function go(month, day, userSpotifyId, token, name) {
               offset: ran,
               time_range: range
             })
-            .then(function(res) {
+            .then(function (res) {
               for (let item of res.body.items) {
                 let e = {}
                 e = {
@@ -163,7 +173,7 @@ async function go(month, day, userSpotifyId, token, name) {
             topTracks.push(e)
           }
         }
-      }).catch(function(err) {
+      }).catch(function (err) {
         console.error(err);
       })
 
@@ -182,7 +192,7 @@ async function go(month, day, userSpotifyId, token, name) {
         seed_tracks: shorter,
         limit: (settings.limit - 5)
       })
-      .then(function(res) {
+      .then(function (res) {
         for (let item of res.body.tracks) {
           playlist.push(item.uri)
         }
@@ -190,22 +200,26 @@ async function go(month, day, userSpotifyId, token, name) {
           playlist.push(item)
         }
         shuffle(playlist)
-      }).catch(function(err) {
+      }).catch(function (err) {
         console.error(err);
       })
 
     await spotify.createPlaylist( // create a new playlist
-      userSpotifyId,
-      `For ${name} by Astrofy`, {
-        'public': true,
-        'description': `${String.fromCodePoint(cover.emoji)} ${sign.toUpperCase()}: ${fortune}`
-      })
-      .then(async function(res) {
-        uploadCoverImage(res.body.id, key, cover.image)
-        await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist
-        .catch((err) => { console.error(err) })
+        userSpotifyId,
+        `For ${name} by Astrofy`, {
+          'public': true,
+          'description': `${String.fromCodePoint(cover.emoji)} ${sign.toUpperCase()}: ${fortune}`
+        })
+      .then(async function (res) {
+          uploadCoverImage(res.body.id, key, cover.image)
+          await spotify.addTracksToPlaylist(res.body.id, playlist) // add tracks to playlist
+            .catch((err) => {
+              console.error(err)
+            })
         },
-        function(err) { console.error(err) });
+        function (err) {
+          console.error(err)
+        });
   })
 }
 
@@ -218,7 +232,7 @@ CONNECTOR
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
-var generateRandomString = function(length) {
+var generateRandomString = function (length) {
   var text = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -237,13 +251,13 @@ app.use(express.static(__dirname + '/public'))
   .use(cors())
   .use(cookieParser())
   .use(bodyParser.json())
-  .use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3001"); // update to match the domain you will make the request from
+  .use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", website); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
   });
 
-app.get('/login', function(req, res) {
+app.get('/login', function (req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
 
@@ -259,7 +273,7 @@ app.get('/login', function(req, res) {
     }));
 });
 
-app.get('/callback', function(req, res) {
+app.get('/callback', function (req, res) {
 
   // your application requests refresh and access tokens
   // after checking the state parameter
@@ -288,7 +302,7 @@ app.get('/callback', function(req, res) {
       json: true
     };
 
-    request.post(authOptions, function(error, response, body) {
+    request.post(authOptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
 
         var access_token = body.access_token,
@@ -301,17 +315,17 @@ app.get('/callback', function(req, res) {
           },
           json: true
         };
-        
+
         // use the access token to access the Spotify Web API
-        request.get(options, function(error, response, body) {
+        request.get(options, function (error, response, body) {
           user = body.user;
           country = body.country
 
-          return(user, country)
+          return (user, country)
         });
-        console.log(user,country)
+        console.log(user, country)
         // we can also pass the token to the browser to make requests from there
-        res.redirect('http://localhost:3000/#' +
+        res.redirect(`${website}/#` +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
@@ -326,7 +340,7 @@ app.get('/callback', function(req, res) {
   }
 });
 
-app.get('/refresh_token', function(req, res) {
+app.get('/refresh_token', function (req, res) {
 
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
@@ -342,7 +356,7 @@ app.get('/refresh_token', function(req, res) {
     json: true
   };
 
-  request.post(authOptions, function(error, response, body) {
+  request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var access_token = body.access_token;
       res.send({

@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import '../App.css';
+// import '../App.css';
 import GetFate from './GetFate';
 import Form from './Form';
-    
+
 
 function App() {
     let [params,setParams] = useState(null);
@@ -14,6 +14,7 @@ function App() {
       name: '',
       month: '',
       day: '',
+      message: '',
       clicked: false
     })
 
@@ -27,10 +28,10 @@ function App() {
       e.preventDefault();
       setVisibility({display: 'none'})
       setState({...state, clicked: true})
-      
+
     };
 
-    
+
     // console.log(state);
     useEffect(() => {
       var hashParams = {};
@@ -48,28 +49,64 @@ function App() {
       // console.log(login)
     }, [])
 
-    
+
   return (
-    <div className="background">
-      <div className="headers">
-        {login?
-        <>
-          <div style={{display: visibility.display}}>
-          <h1>YOUR HOROSCOPE PLAYLIST</h1>
-          <h3>Enter your name and birthday <br/> and get your <span id="green">playlist!</span></h3>
-          <Form
-              handleChange={handleChange} 
-              handleClick={handleClick} 
-              state={state}/>
+    <div className="body">
+      <div className="overall">
+        <div>
+          <div>
+            <img src='./logo.png' alt='logo' className='logo'/>
           </div>
-          {state.clicked? <GetFate month={state.month} day={state.day} name={state.name} token={params.access_token}/>: null}
-          </>
-        : <><h1>ASTROFY MUSIC</h1>
-        <h2>Make a playlist aligned <br/>to your <span id="green">horoscope</span></h2>
-        <h3>Simply enter your name and birthday <br/> and you're on your way!</h3>
-          <a href="http://localhost:8888/login"><div className="button">CONNECT TO SPOTIFY</div></a></>}
+          <div>
+            <h1>Astrofy<span className="hidden"> </span>Music</h1>
+          </div>
         </div>
+      {login?
+      <>
+
+      <div style={{display: visibility.display}}>
+        <div className="form-container">
+          <div className="title">
+            <h2>One More Step</h2>
+            <p>
+              Simply enter your name and birthday and you’re on your way!
+            </p>
+          </div>
+        </div>
+        <div>
+          <Form
+              handleChange={handleChange}
+              handleClick={handleClick}
+              state={state}/>
+        </div>
+      </div>
+      {state.clicked? <GetFate month={state.month} day={state.day} name={state.name} token={params.access_token}/>: null}
+
+        </>
+      : <>
+      <div className="container">
+        <div className="title">
+          <h2>Make a Playlist Based on Your Horoscope</h2>
+          <p>
+            Let your stars lead the way to vibes and music awesomeness!
+          </p>
+        </div>
+      </div>
+      <div className="container">
+        <a href="http://localhost:8888/login">
+          <div className='button'>Connect to Spotify</div>
+        </a>
+      </div></>}
+
+      <footer>
+        <div className="footer">
+          <p>
+            &copy; 2020. a toy by <a href='https://twitter.com/seyitaylor' target='_blank' rel="noopener noreferrer">st</a> and <a href='https://twitter.com/theVunderkind' target = '_blank' rel="noopener noreferrer">justin</a><br/>Icons by <a href="https://thenounproject.com/zzyzz/" target="_blank" rel="noopener noreferrer">olena</a> and <a href="https://thenounproject.com/denismm/" target="_blank" rel="noopener noreferrer">denis</a>
+          </p>
+        </div>
+      </footer>
     </div>
+  </div>
   );
 }
 

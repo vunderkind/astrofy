@@ -1,8 +1,5 @@
 # Astrofy: Your Spotify Horoscope!
 
-## To-do
-- [ ] Set up react app
-- [ ] Set up backend properly to return playlist
-- [ ] Wire frontend to backend
-- [ ] Figure out production-level auth
+## How it works
+Astrofy works by reading your horoscope, then using your lucky number to generate a Spotify playlist for you!
 

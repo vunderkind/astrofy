@@ -10,7 +10,6 @@ const img = require('./img')
 const SpotifyWebApi = require('spotify-web-api-node');
 const horoscope = require('horoscope')
 const spotify = new SpotifyWebApi();
-const request = require('request');
 
 const override = css`
   display: block;
@@ -26,10 +25,13 @@ const override = css`
         loading: true
       })
 
+      let fabulous;
+
       let [musicData, setMusicData] = useState({
         fortune: '',
         horoscope: '',
-        name: ''
+        name: '',
+        length: ''
       })
         let userID;
         let cover;
@@ -111,6 +113,10 @@ const override = css`
                     zod.image = img.capricorn;
                     zod.emoji = '0x2651'
                     break;
+                  default:
+                    zod.image = img.capricorn;
+                    zod.emoji = '0x2651'
+                    break;
                 }
                 return zod;
               }
@@ -158,7 +164,8 @@ const override = css`
                       time_range: range
                     })
                     .then(async function(res) {
-                      if (res.body.items.length == 0) {
+
+                      if (res.body.items.length === 0) {
                         let ran = Math.floor(Math.random() * settings.limit--)
               
                         await spotify.getMyTopTracks({
@@ -171,7 +178,10 @@ const override = css`
                               let e = {}
                               e = {
                                 id: item.id,
-                                uri: item.uri
+                                uri: item.uri,
+                                artist_name: item.album.artists[0].name,
+                                image: item.album.images[0].url,
+                                length: topTracks.length-5
                               }
                               topTracks.push(e)
                             }
@@ -181,7 +191,9 @@ const override = css`
                           let e = {}
                           e = {
                             id: item.id,
-                            uri: item.uri
+                            uri: item.uri,
+                            artist_name: item.album.artists[0].name,
+                            image: item.album.images[0].url,
                           }
                           topTracks.push(e)
                         }
@@ -195,7 +207,7 @@ const override = css`
                   let shorter = [] // seed list
                   let shorter_uri = []
                   let playlist = [] // empty playlist
-                  console.log('Top tracks: ', topTracks)
+                  // console.log('Top tracks: ', topTracks)
               
                   for (let i = 0; i < 5; i++) {
                     shorter.push(topTracks[i].id)
@@ -226,6 +238,8 @@ const override = css`
                       'description': `${sign.toUpperCase()}: ${fortune}`
                     }) //took out the String.fromCodePoint method because it sometimes returns NaN instead of expected Unicode. See documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCodePoint
                     .then(async function(res) {
+                      fabulous = res.body.external_urls.spotify
+                      console.log(fabulous)
                       uploadCoverImage(res.body.id, key, cover.image)
                       await spotify.addTracksToPlaylist(res.body.id, playlist)
                       .then(res=>{
@@ -233,9 +247,13 @@ const override = css`
                         setMusicData({
                           horoscope: sign,
                           fortune,
-                          name: userName
+                          name: userName,
+                          tracks: topTracks,
+                          length:topTracks.length-5,
+                          playlist_url: fabulous
 
-                        })}
+                        });
+                      console.log(res)}
                         ) // add tracks to playlist
                       .catch((err) => { console.error(err) })
                       },
@@ -247,13 +265,15 @@ const override = css`
     },[])
         return (
           
-          state.loading? <div className="sweet-loading">
+          state.loading? <div className="sweet-loading centered">
           <ScaleLoader
             css={override}
             size={150}
             color={"rgb(30,185,84)"}
-            loading={state.loading}/></div>
+            loading={state.loading}/>
+            </div>
             : 
-            <Results name={musicData.name} horoscope={musicData.horoscope} fortune={musicData.fortune}/>
+            <Results name={props.name} horoscope={musicData.horoscope} fortune={musicData.fortune} tracks={musicData.tracks} length={musicData.length} playlist_url={musicData.playlist_url}/>
+            
         )
       }
