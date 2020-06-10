@@ -7,8 +7,8 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
 
-const client_id = '2e1627a177104abe9c124cfc3fd0df7e'; // Your client id
-const client_secret = '4633ef10f541414b905e30ba8763bca6'; // Your secret
+const client_id = '2e1627a177104abe9c124cfc3fd0df7e'; // Your client id // Mine -> 2538eb4cf1e44053b1c1d5f6c5ba861e
+const client_secret = '4633ef10f541414b905e30ba8763bca6'; // Your secret // Mine -> e4288b338d6b4d71acaf8addbe060b89
 const img = require('./img')
 
 const astro = require("aztro-js")
