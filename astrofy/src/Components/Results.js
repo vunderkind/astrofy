@@ -1,5 +1,4 @@
 import React from 'react';
-import icon from '../img/astro.png'
 import '../App.css'
 
 export default function Results(props){
