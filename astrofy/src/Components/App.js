@@ -101,7 +101,7 @@ function App() {
       <footer>
         <div className="footer">
           <p>
-            &copy; 2020. a toy by <a href='https://twitter.com/seyitaylor' target='_blank' rel="noopener noreferrer">st</a> and <a href='https://twitter.com/theVunderkind' target = '_blank' rel="noopener noreferrer">justin</a><br/>Icons by <a href="https://thenounproject.com/zzyzz/" target="_blank" rel="noopener noreferrer">olena</a> and <a href="https://thenounproject.com/denismm/" target="_blank" rel="noopener noreferrer">denis</a>
+            &copy; 2020. a toy by <a href='https://twitter.com/seyitaylor' target='_blank' rel="noopener noreferrer">st</a> and <a href='https://twitter.com/LifeofMogwai' target = '_blank' rel="noopener noreferrer">mogwai</a><br/>Icons by <a href="https://thenounproject.com/zzyzz/" target="_blank" rel="noopener noreferrer">olena</a> and <a href="https://thenounproject.com/denismm/" target="_blank" rel="noopener noreferrer">denis</a>
           </p>
         </div>
       </footer>
