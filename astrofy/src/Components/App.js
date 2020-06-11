@@ -5,6 +5,7 @@ import Form from './Form';
 
 
 function App() {
+    let serverURL = `https://gentle-garden-14638.herokuapp.com/login`
     let [params,setParams] = useState(null);
     let [login, setLogin] = useState(false);
     let [visibility, setVisibility] = useState({
@@ -93,7 +94,7 @@ function App() {
         </div>
       </div>
       <div className="container">
-        <a href="http://localhost:8888/login">
+        <a href= {serverURL}>
           <div className='button'>Connect to Spotify</div>
         </a>
       </div></>}

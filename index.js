@@ -12,7 +12,7 @@ const client_secret = '4633ef10f541414b905e30ba8763bca6'; // Your secret // Mine
 
 
 const website = 'https://astrofy.live'
-const server = 'https://gentle-garden-14638.herokuapp.com/'
+const server = 'https://gentle-garden-14638.herokuapp.com'
 
 let port = process.env.PORT || '8888';
 const redirect_uri = `${server}/callback/`; // Your redirect uri
@@ -51,7 +51,7 @@ app.use(express.static(__dirname + '/public'))
     next();
   });
 
-app.get('*', function (req, res){
+app.get('/', function (req, res){
   res.send(`<div style='width:50vw; margin: 0 auto; padding-top: 40px;'><h1 style='text-align:center'>I am alive. What is my purpose?</h1><p>Listen Morty, I hate to break it to you, but what people call “love” is just a chemical reaction that compels animals to breed. It hits hard, Morty, then it slowly fades, leaving you stranded in a failing marriage. I did it. Your parents are gonna do it. Break the cycle, Morty. Rise above. Focus on science.</p><br/> <p>All right, all right, cool it! I see what's happening here. You're both young, you're both unsure about your place in the universe, and you both want to be Grandpa's favorite. I can fix this. Morty, sit here. Summer, you sit here. Now, listen—I know the two of you are very different from each other in a lot of ways, but you have to understand that as far as Grandpa's concerned, you're both pieces of sh*t! Yeah. I can prove it mathematically. Actually, l-l-let me grab my whiteboard. This has been a long time coming, anyways.</p><br/><br/><div style='text-align:center; margin-top:20px;'><img src='https://media.giphy.com/media/Q22kcRdASuBvW/giphy.gif' alt="wubba-lubba-dub-dub"></div></div>`)
 })
 
