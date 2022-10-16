@@ -6,13 +6,14 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser')
+const dotenv = require('dotenv');
 
-const client_id = '2e1627a177104abe9c124cfc3fd0df7e'; // Your client id // Mine -> 2538eb4cf1e44053b1c1d5f6c5ba861e
-const client_secret = '4633ef10f541414b905e30ba8763bca6'; // Your secret // Mine -> e4288b338d6b4d71acaf8addbe060b89
+const client_id = process.env.CLIENT_ID;
+const client_secret = process.env.CLIENT_SECRET;
 
 
-const website = 'https://astrofy.live'
-const server = 'https://gentle-garden-14638.herokuapp.com'
+const website = process.env.WEBSITE_URL
+const server = process.env.SERVER_URL
 
 let port = process.env.PORT || '8888';
 const redirect_uri = `${server}/callback/`; // Your redirect uri
@@ -26,6 +27,7 @@ CONNECTOR
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
+
 var generateRandomString = function (length) {
   var text = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -55,7 +57,7 @@ app.get('/', function (req, res){
   res.send(`<div style='width:50vw; margin: 0 auto; padding-top: 40px;'><h1 style='text-align:center'>I am alive. What is my purpose?</h1><p>Listen Morty, I hate to break it to you, but what people call “love” is just a chemical reaction that compels animals to breed. It hits hard, Morty, then it slowly fades, leaving you stranded in a failing marriage. I did it. Your parents are gonna do it. Break the cycle, Morty. Rise above. Focus on science.</p><br/> <p>All right, all right, cool it! I see what's happening here. You're both young, you're both unsure about your place in the universe, and you both want to be Grandpa's favorite. I can fix this. Morty, sit here. Summer, you sit here. Now, listen—I know the two of you are very different from each other in a lot of ways, but you have to understand that as far as Grandpa's concerned, you're both pieces of sh*t! Yeah. I can prove it mathematically. Actually, l-l-let me grab my whiteboard. This has been a long time coming, anyways.</p><br/><br/><div style='text-align:center; margin-top:20px;'><img src='https://media.giphy.com/media/Q22kcRdASuBvW/giphy.gif' alt="wubba-lubba-dub-dub"></div></div>`)
 })
 
-app.get('/login', function (req, res) {
+app.get('/login', function (_, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
 
