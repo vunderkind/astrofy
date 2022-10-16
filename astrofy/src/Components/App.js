@@ -5,7 +5,7 @@ import Form from './Form';
 
 
 function App() {
-    let serverURL = `https://gentle-garden-14638.herokuapp.com/login`
+    let serverURL = `https://astrofy.herokuapp.com/login`
     let [params,setParams] = useState(null);
     let [login, setLogin] = useState(false);
     let [visibility, setVisibility] = useState({
